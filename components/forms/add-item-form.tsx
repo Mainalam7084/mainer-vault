@@ -9,6 +9,21 @@ import { Select } from "@/components/ui/select";
 import { uploadImage } from "@/lib/supabase/storage";
 import { CreateItemInput, ItemCategory } from "@/lib/types";
 
+function toSafeImageSrc(value: string): string {
+  if (!value) return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  try {
+    const parsed = new URL(trimmed, window.location.origin);
+    const allowedProtocols = new Set(["http:", "https:", "blob:"]);
+    if (!allowedProtocols.has(parsed.protocol)) return "";
+    return parsed.toString();
+  } catch {
+    return "";
+  }
+}
+
 export function AddItemForm() {
   const router = useRouter();
   const [category, setCategory] = useState<ItemCategory>("card");
@@ -19,7 +34,7 @@ export function AddItemForm() {
 
   const imagePreview = useMemo(() => {
     if (imageFile) return URL.createObjectURL(imageFile);
-    return imageUrl;
+    return toSafeImageSrc(imageUrl);
   }, [imageFile, imageUrl]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
