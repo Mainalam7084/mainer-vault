@@ -16,13 +16,15 @@ export function CollectibleCard({ item }: { item: ItemWithDetails }) {
           : "border-vault-border bg-vault-card shadow-vault hover:shadow-vault-hover"
       }`}
     >
-      <div className="relative mb-3 aspect-[4/3] overflow-hidden rounded-lg border-[3px] border-vault-border bg-vault-soft">
+      <div className="mb-3 overflow-hidden rounded-lg border-[3px] border-vault-border bg-vault-soft">
         {item.image_url ? (
           <Image
             src={item.image_url}
             alt={item.name}
-            fill
-            className="object-cover transition duration-300 group-hover:scale-105"
+            width={0}
+            height={0}
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="h-auto w-full transition duration-300 group-hover:scale-105"
           />
         ) : null}
       </div>
