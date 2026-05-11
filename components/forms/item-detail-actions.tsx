@@ -32,23 +32,23 @@ function UploadIcon() {
 }
 
 function initFields(item: ItemWithDetails) {
-  const d = item.details ?? {};
+  const d = item.details;
   return {
     name: item.name,
     price: String(item.price),
     purchase_date: item.purchase_date,
     purchase_place: item.purchase_place,
     notes: item.notes ?? "",
-    player: "player" in d ? d.player : "",
-    team: "player" in d ? d.team : "",
-    collection: "player" in d ? d.collection : "",
-    serial_number: "player" in d ? d.serial_number : "",
-    type: "player" in d ? d.type : "base",
-    country: "country" in d ? d.country : "",
-    year: "year" in d ? String(d.year) : "",
-    material: "material" in d ? d.material : "",
-    currency_field: "currency" in d ? d.currency : "",
-    condition: "condition" in d ? d.condition : "",
+    player: d && "player" in d ? d.player : "",
+    team: d && "player" in d ? d.team : "",
+    collection: d && "player" in d ? d.collection : "",
+    serial_number: d && "player" in d ? d.serial_number : "",
+    type: d && "player" in d ? d.type : "base",
+    country: d && "country" in d ? d.country : "",
+    year: d && "year" in d ? String(d.year) : "",
+    material: d && "material" in d ? d.material : "",
+    currency_field: d && "currency" in d ? d.currency : "",
+    condition: d && "condition" in d ? d.condition : "",
   };
 }
 
