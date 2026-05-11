@@ -23,7 +23,9 @@ export default async function ItemDetailPage({
     <AppShell title={item.name} subtitle="Detailed collectible profile with value and provenance.">
       <CardContainer className="grid gap-5 lg:grid-cols-2">
         <div className="relative aspect-square overflow-hidden rounded-vault border-[3px] border-vault-border bg-vault-soft">
-          <Image src={item.image_url} alt={item.name} fill className="object-cover" />
+          {item.image_url ? (
+            <Image src={item.image_url} alt={item.name} fill className="object-cover" />
+          ) : null}
         </div>
         <div>
           <div className="mb-3 flex flex-wrap gap-2">

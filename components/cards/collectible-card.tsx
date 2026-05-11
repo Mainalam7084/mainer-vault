@@ -17,12 +17,14 @@ export function CollectibleCard({ item }: { item: ItemWithDetails }) {
       }`}
     >
       <div className="relative mb-3 aspect-[4/3] overflow-hidden rounded-lg border-[3px] border-vault-border bg-vault-soft">
-        <Image
-          src={item.image_url}
-          alt={item.name}
-          fill
-          className="object-cover transition duration-300 group-hover:scale-105"
-        />
+        {item.image_url ? (
+          <Image
+            src={item.image_url}
+            alt={item.name}
+            fill
+            className="object-cover transition duration-300 group-hover:scale-105"
+          />
+        ) : null}
       </div>
       <div className="mb-2 flex items-center justify-between">
         <Badge className={categoryColor[item.category]}>{categoryLabel[item.category]}</Badge>
