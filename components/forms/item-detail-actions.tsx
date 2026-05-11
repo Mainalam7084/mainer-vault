@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -31,6 +31,27 @@ function UploadIcon() {
   );
 }
 
+function initFields(item: ItemWithDetails) {
+  const d = item.details ?? {};
+  return {
+    name: item.name,
+    price: String(item.price),
+    purchase_date: item.purchase_date,
+    purchase_place: item.purchase_place,
+    notes: item.notes ?? "",
+    player: "player" in d ? d.player : "",
+    team: "player" in d ? d.team : "",
+    collection: "player" in d ? d.collection : "",
+    serial_number: "player" in d ? d.serial_number : "",
+    type: "player" in d ? d.type : "base",
+    country: "country" in d ? d.country : "",
+    year: "year" in d ? String(d.year) : "",
+    material: "material" in d ? d.material : "",
+    currency_field: "currency" in d ? d.currency : "",
+    condition: "condition" in d ? d.condition : "",
+  };
+}
+
 export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -39,19 +60,35 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [fields, setFields] = useState(() => initFields(item));
+
+  function set(key: keyof typeof fields) {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+      setFields((prev) => ({ ...prev, [key]: e.target.value }));
+  }
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
     setImageFile(file);
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    } else {
-      setImagePreview("");
-    }
+    setImagePreview(file ? URL.createObjectURL(file) : "");
   }
 
-  async function handleUpdate(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function openEdit() {
+    setFields(initFields(item));
+    setImageFile(null);
+    setImagePreview("");
+    setMessage(null);
+    setIsEditing(true);
+  }
+
+  function cancelEdit() {
+    setIsEditing(false);
+    setImageFile(null);
+    setImagePreview("");
+  }
+
+  async function handleUpdate(e: React.FormEvent) {
+    e.preventDefault();
     setIsSaving(true);
     setMessage(null);
 
@@ -61,38 +98,37 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
         imageUrl = await uploadImage(imageFile);
       }
 
-      const formData = new FormData(event.currentTarget);
       const details =
         item.category === "card"
           ? {
-              player: String(formData.get("player") ?? ""),
-              team: String(formData.get("team") ?? ""),
-              collection: String(formData.get("collection") ?? ""),
-              serial_number: String(formData.get("serial_number") ?? ""),
-              type: String(formData.get("type") ?? "base") as CardDetails["type"],
-              condition: String(formData.get("condition") ?? ""),
+              player: fields.player,
+              team: fields.team,
+              collection: fields.collection,
+              serial_number: fields.serial_number,
+              type: fields.type as CardDetails["type"],
+              condition: fields.condition,
             }
           : item.category === "coin"
             ? {
-                country: String(formData.get("country") ?? ""),
-                year: Number(formData.get("year") ?? 0),
-                material: String(formData.get("material") ?? ""),
-                condition: String(formData.get("condition") ?? ""),
+                country: fields.country,
+                year: Number(fields.year),
+                material: fields.material,
+                condition: fields.condition,
               }
             : {
-                country: String(formData.get("country") ?? ""),
-                currency: String(formData.get("currency") ?? ""),
-                year: Number(formData.get("year") ?? 0),
-                condition: String(formData.get("condition") ?? ""),
+                country: fields.country,
+                currency: fields.currency_field,
+                year: Number(fields.year),
+                condition: fields.condition,
               };
 
       const payload: UpdateItemInput = {
-        name: String(formData.get("name") ?? ""),
+        name: fields.name,
         image_url: imageUrl,
-        price: Number(formData.get("price") ?? 0),
-        purchase_date: String(formData.get("purchase_date") ?? ""),
-        purchase_place: String(formData.get("purchase_place") ?? ""),
-        notes: String(formData.get("notes") ?? ""),
+        price: Number(fields.price),
+        purchase_date: fields.purchase_date,
+        purchase_place: fields.purchase_place,
+        notes: fields.notes,
         details,
       };
 
@@ -148,25 +184,25 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
           <div className="grid gap-3 md:grid-cols-2">
             <label className="space-y-1">
               <span className="text-sm font-semibold text-vault-muted">Name</span>
-              <Input name="name" defaultValue={item.name} required />
+              <Input value={fields.name} onChange={set("name")} required />
             </label>
             <label className="space-y-1">
               <span className="text-sm font-semibold text-vault-muted">Price (€)</span>
-              <Input name="price" type="number" defaultValue={item.price} required min={0} step="0.01" />
+              <Input type="number" value={fields.price} onChange={set("price")} required min={0} step="0.01" />
             </label>
             <label className="space-y-1">
               <span className="text-sm font-semibold text-vault-muted">Purchase Date</span>
-              <Input name="purchase_date" type="date" defaultValue={item.purchase_date} required />
+              <Input type="date" value={fields.purchase_date} onChange={set("purchase_date")} required />
             </label>
             <label className="space-y-1">
               <span className="text-sm font-semibold text-vault-muted">Purchase Place</span>
-              <Input name="purchase_place" defaultValue={item.purchase_place} required />
+              <Input value={fields.purchase_place} onChange={set("purchase_place")} required />
             </label>
           </div>
 
           <label className="space-y-1">
             <span className="text-sm font-semibold text-vault-muted">Notes</span>
-            <Input name="notes" defaultValue={item.notes} />
+            <Input value={fields.notes} onChange={set("notes")} />
           </label>
 
           <div className="space-y-1">
@@ -201,23 +237,23 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
             <div className="grid gap-3 md:grid-cols-2">
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Player</span>
-                <Input name="player" defaultValue={item.details.player} required />
+                <Input value={fields.player} onChange={set("player")} required />
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Team</span>
-                <Input name="team" defaultValue={item.details.team} required />
+                <Input value={fields.team} onChange={set("team")} required />
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Collection</span>
-                <Input name="collection" defaultValue={item.details.collection} required />
+                <Input value={fields.collection} onChange={set("collection")} required />
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Serial Number</span>
-                <Input name="serial_number" defaultValue={item.details.serial_number} required />
+                <Input value={fields.serial_number} onChange={set("serial_number")} required />
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Type</span>
-                <Select name="type" defaultValue={item.details.type} required>
+                <Select value={fields.type} onChange={set("type")} required>
                   <option value="auto">Auto</option>
                   <option value="patch">Patch</option>
                   <option value="base">Base</option>
@@ -226,7 +262,7 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Condition</span>
-                <Input name="condition" defaultValue={item.details.condition} required />
+                <Input value={fields.condition} onChange={set("condition")} required />
               </label>
             </div>
           ) : null}
@@ -235,19 +271,19 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
             <div className="grid gap-3 md:grid-cols-2">
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Country</span>
-                <Input name="country" defaultValue={item.details.country} required />
+                <Input value={fields.country} onChange={set("country")} required />
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Year</span>
-                <Input name="year" type="number" defaultValue={item.details.year} required />
+                <Input type="number" value={fields.year} onChange={set("year")} required />
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Material</span>
-                <Input name="material" defaultValue={item.details.material} required />
+                <Input value={fields.material} onChange={set("material")} required />
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Condition</span>
-                <Input name="condition" defaultValue={item.details.condition} required />
+                <Input value={fields.condition} onChange={set("condition")} required />
               </label>
             </div>
           ) : null}
@@ -256,19 +292,19 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
             <div className="grid gap-3 md:grid-cols-2">
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Country</span>
-                <Input name="country" defaultValue={item.details.country} required />
+                <Input value={fields.country} onChange={set("country")} required />
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Currency</span>
-                <Input name="currency" defaultValue={item.details.currency} required />
+                <Input value={fields.currency_field} onChange={set("currency_field")} required />
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Year</span>
-                <Input name="year" type="number" defaultValue={item.details.year} required />
+                <Input type="number" value={fields.year} onChange={set("year")} required />
               </label>
               <label className="space-y-1">
                 <span className="text-sm font-semibold text-vault-muted">Condition</span>
-                <Input name="condition" defaultValue={item.details.condition} required />
+                <Input value={fields.condition} onChange={set("condition")} required />
               </label>
             </div>
           ) : null}
@@ -277,14 +313,14 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
             <Button type="submit" disabled={isSaving}>
               {isSaving ? "Saving…" : "Save Changes"}
             </Button>
-            <Button type="button" variant="secondary" onClick={() => { setIsEditing(false); setImageFile(null); setImagePreview(""); }}>
+            <Button type="button" variant="secondary" onClick={cancelEdit}>
               Cancel
             </Button>
           </div>
         </form>
       ) : (
         <div className="flex flex-wrap items-center gap-2">
-          <Button onClick={() => setIsEditing(true)}>Edit Item</Button>
+          <Button onClick={openEdit}>Edit Item</Button>
           <Button variant="danger" onClick={() => setConfirmDelete(true)}>
             Delete
           </Button>
