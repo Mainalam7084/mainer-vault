@@ -74,7 +74,7 @@ export function CollectionGrid({
               type="number"
               value={minPrice}
               onChange={(e) => setMinPrice(e.target.value)}
-              placeholder="Min price ($)"
+              placeholder="Min price (€)"
               aria-label="Minimum price"
               min={0}
             />
@@ -85,7 +85,7 @@ export function CollectionGrid({
               type="number"
               value={maxPrice}
               onChange={(e) => setMaxPrice(e.target.value)}
-              placeholder="Max price ($)"
+              placeholder="Max price (€)"
               aria-label="Maximum price"
               min={0}
             />

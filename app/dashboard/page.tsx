@@ -99,7 +99,7 @@ export default async function DashboardPage() {
     <AppShell title="Dashboard">
       <section aria-label="Collection stats" className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Total Items" value={items.length} icon={<IconBox />} />
-        <StatCard label="Total Value" value={Math.round(totalValue)} prefix="$" icon={<IconValue />} />
+        <StatCard label="Total Value" value={Math.round(totalValue)} prefix="€" icon={<IconValue />} />
         <StatCard label="Rare Items" value={rareCount} icon={<IconTrophy />} />
         <StatCard label="Recent Additions" value={recentItems.length} icon={<IconClock />} />
       </section>

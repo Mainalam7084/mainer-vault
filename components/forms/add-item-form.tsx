@@ -141,7 +141,7 @@ export function AddItemForm() {
             <Input placeholder="2018 Mbappe Select Silver" name="name" required />
           </label>
           <label className="space-y-1">
-            <span className="text-sm font-semibold text-vault-muted">Price ($)</span>
+            <span className="text-sm font-semibold text-vault-muted">Price (€)</span>
             <Input type="number" placeholder="249.99" name="price" min={0} step="0.01" required />
           </label>
           <label className="space-y-1">

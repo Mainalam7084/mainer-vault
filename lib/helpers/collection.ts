@@ -1,7 +1,7 @@
 import { Item, ItemCategory } from "@/lib/types";
 
 export const formatCurrency = (amount: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+  new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(
     amount,
   );
 
