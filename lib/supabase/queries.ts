@@ -107,7 +107,7 @@ export async function createItem(input: CreateItemInput): Promise<ItemWithDetail
 
   if (itemError) throw toAppError(itemError, "Failed to create item.");
 
-  const detailPayload = { ...input.details, item_id: item.id };
+  const detailPayload = { ...input.details, item_id: item.id } as any;
   if (input.category === "card") {
     const { error } = await supabase.from("card_details").insert(detailPayload);
     if (error) throw toAppError(error, "Failed to create card details.");
@@ -140,7 +140,7 @@ export async function updateItem(id: string, category: ItemCategory, input: Upda
 
   if (itemError) throw toAppError(itemError, "Failed to update item.");
 
-  const detailsPayload = { ...input.details };
+  const detailsPayload = { ...input.details } as any;
   if (category === "card") {
     const { error } = await supabase.from("card_details").update(detailsPayload).eq("item_id", id);
     if (error) throw toAppError(error, "Failed to update card details.");
