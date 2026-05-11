@@ -91,9 +91,14 @@ export async function getItemById(id: string): Promise<ItemWithDetails | null> {
 
 export async function createItem(input: CreateItemInput): Promise<ItemWithDetails> {
   const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated.");
+
   const { data: item, error: itemError } = await supabase
     .from("items")
     .insert({
+      user_id: user.id,
       name: input.name,
       category: input.category,
       image_url: input.image_url,

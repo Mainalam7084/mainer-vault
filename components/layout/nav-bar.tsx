@@ -7,6 +7,7 @@ const nav = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/collection", label: "Collection" },
   { href: "/add", label: "Add Item" },
+  { href: "/profile", label: "Profile" },
 ];
 
 export function NavBar() {

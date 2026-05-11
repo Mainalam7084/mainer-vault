@@ -4,6 +4,7 @@ export type Rarity = "Common" | "Rare" | "Legendary";
 
 export interface Item {
   id: string;
+  user_id: string;
   name: string;
   category: ItemCategory;
   image_url: string;

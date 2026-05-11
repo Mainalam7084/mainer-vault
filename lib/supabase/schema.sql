@@ -1,5 +1,6 @@
 create table if not exists public.items (
   id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
   name text not null,
   category text not null check (category in ('card', 'coin', 'banknote')),
   image_url text,
@@ -41,17 +42,35 @@ alter table public.card_details enable row level security;
 alter table public.coin_details enable row level security;
 alter table public.banknote_details enable row level security;
 
+-- Items: each user only sees and manages their own items
 drop policy if exists "open_access_items" on public.items;
-create policy "open_access_items" on public.items for all using (true) with check (true);
+drop policy if exists "users_manage_own_items" on public.items;
+create policy "users_manage_own_items"
+  on public.items for all
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
 
+-- Detail tables: access is scoped through parent item ownership
 drop policy if exists "open_access_card_details" on public.card_details;
-create policy "open_access_card_details" on public.card_details for all using (true) with check (true);
+drop policy if exists "users_manage_own_card_details" on public.card_details;
+create policy "users_manage_own_card_details"
+  on public.card_details for all
+  using (item_id in (select id from public.items where user_id = auth.uid()))
+  with check (item_id in (select id from public.items where user_id = auth.uid()));
 
 drop policy if exists "open_access_coin_details" on public.coin_details;
-create policy "open_access_coin_details" on public.coin_details for all using (true) with check (true);
+drop policy if exists "users_manage_own_coin_details" on public.coin_details;
+create policy "users_manage_own_coin_details"
+  on public.coin_details for all
+  using (item_id in (select id from public.items where user_id = auth.uid()))
+  with check (item_id in (select id from public.items where user_id = auth.uid()));
 
 drop policy if exists "open_access_banknote_details" on public.banknote_details;
-create policy "open_access_banknote_details" on public.banknote_details for all using (true) with check (true);
+drop policy if exists "users_manage_own_banknote_details" on public.banknote_details;
+create policy "users_manage_own_banknote_details"
+  on public.banknote_details for all
+  using (item_id in (select id from public.items where user_id = auth.uid()))
+  with check (item_id in (select id from public.items where user_id = auth.uid()));
 
 insert into storage.buckets (id, name, public)
 values ('items', 'items', true)
@@ -67,3 +86,10 @@ create policy "public_items_write"
 on storage.objects for all
 using (bucket_id = 'items')
 with check (bucket_id = 'items');
+
+-- ============================================================
+-- MIGRATION: run this block in Supabase SQL Editor if your
+-- items table already exists without the user_id column.
+-- ============================================================
+-- alter table public.items
+--   add column if not exists user_id uuid references auth.users(id) on delete cascade;
