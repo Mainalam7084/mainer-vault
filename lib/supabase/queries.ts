@@ -102,6 +102,7 @@ export async function createItem(input: CreateItemInput): Promise<ItemWithDetail
       name: input.name,
       category: input.category,
       image_url: input.image_url,
+      image_url_2: input.image_url_2,
       price: input.price,
       purchase_date: input.purchase_date,
       purchase_place: input.purchase_place,
@@ -136,6 +137,7 @@ export async function updateItem(id: string, category: ItemCategory, input: Upda
     .update({
       name: input.name,
       image_url: input.image_url,
+      image_url_2: input.image_url_2,
       price: input.price,
       purchase_date: input.purchase_date,
       purchase_place: input.purchase_place,

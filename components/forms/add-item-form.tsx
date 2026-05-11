@@ -35,6 +35,8 @@ export function AddItemForm() {
   const [category, setCategory] = useState<ItemCategory>("card");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [imageFile2, setImageFile2] = useState<File | null>(null);
+  const [imagePreview2, setImagePreview2] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "error" | "success"; text: string } | null>(
     null,
@@ -43,12 +45,13 @@ export function AddItemForm() {
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null;
     setImageFile(file);
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setImagePreview(url);
-    } else {
-      setImagePreview("");
-    }
+    setImagePreview(file ? URL.createObjectURL(file) : "");
+  }
+
+  function handleFileChange2(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null;
+    setImageFile2(file);
+    setImagePreview2(file ? URL.createObjectURL(file) : "");
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -59,15 +62,16 @@ export function AddItemForm() {
     try {
       const formData = new FormData(event.currentTarget);
       let finalImageUrl = "";
+      let finalImageUrl2 = "";
 
-      if (imageFile) {
-        finalImageUrl = await uploadImage(imageFile);
-      }
+      if (imageFile) finalImageUrl = await uploadImage(imageFile);
+      if (imageFile2) finalImageUrl2 = await uploadImage(imageFile2);
 
       const basePayload = {
         name: String(formData.get("name") ?? ""),
         category,
         image_url: finalImageUrl,
+        image_url_2: finalImageUrl2,
         price: Number(formData.get("price") ?? 0),
         purchase_date: String(formData.get("purchase_date") ?? ""),
         purchase_place: String(formData.get("purchase_place") ?? ""),
@@ -259,29 +263,57 @@ export function AddItemForm() {
       </CardContainer>
 
       <CardContainer className="md:col-span-1">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-vault-muted">Image</p>
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-vault-muted">Images</p>
 
-        <label className="mt-3 flex cursor-pointer flex-col items-center gap-2 rounded-lg border-[3px] border-dashed border-vault-border bg-vault-soft px-4 py-5 text-center transition-all hover:border-vault-primary hover:bg-white focus-within:border-vault-primary focus-within:ring-2 focus-within:ring-vault-primary focus-within:ring-offset-1">
-          <UploadIcon />
-          <span className="text-sm font-semibold text-vault-muted">
-            {imageFile ? imageFile.name : "Click to upload image"}
-          </span>
-          <span className="text-xs text-vault-muted">PNG, JPG, WEBP</span>
-          <input
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            onChange={handleFileChange}
-            aria-label="Upload item image"
-          />
-        </label>
-
-        {imagePreview && (
-          <div className="mt-3 overflow-hidden rounded-vault border-[3px] border-vault-border bg-vault-soft">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={imagePreview} alt="Preview" className="h-64 w-full object-cover" />
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-vault-muted">Front</p>
+            <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-[3px] border-dashed border-vault-border bg-vault-soft px-3 py-4 text-center transition-all hover:border-vault-primary hover:bg-white focus-within:border-vault-primary focus-within:ring-2 focus-within:ring-vault-primary focus-within:ring-offset-1">
+              <UploadIcon />
+              <span className="text-xs font-semibold text-vault-muted">
+                {imageFile ? imageFile.name : "Upload photo"}
+              </span>
+              <span className="text-xs text-vault-muted">PNG, JPG, WEBP</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={handleFileChange}
+                aria-label="Upload front image"
+              />
+            </label>
+            {imagePreview && (
+              <div className="overflow-hidden rounded-lg border-[3px] border-vault-border bg-vault-soft">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={imagePreview} alt="Front preview" className="h-auto w-full" />
+              </div>
+            )}
           </div>
-        )}
+
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-vault-muted">Back</p>
+            <label className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-[3px] border-dashed border-vault-border bg-vault-soft px-3 py-4 text-center transition-all hover:border-vault-primary hover:bg-white focus-within:border-vault-primary focus-within:ring-2 focus-within:ring-vault-primary focus-within:ring-offset-1">
+              <UploadIcon />
+              <span className="text-xs font-semibold text-vault-muted">
+                {imageFile2 ? imageFile2.name : "Upload photo"}
+              </span>
+              <span className="text-xs text-vault-muted">PNG, JPG, WEBP</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={handleFileChange2}
+                aria-label="Upload back image"
+              />
+            </label>
+            {imagePreview2 && (
+              <div className="overflow-hidden rounded-lg border-[3px] border-vault-border bg-vault-soft">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={imagePreview2} alt="Back preview" className="h-auto w-full" />
+              </div>
+            )}
+          </div>
+        </div>
       </CardContainer>
     </form>
   );

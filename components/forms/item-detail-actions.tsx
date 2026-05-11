@@ -60,6 +60,8 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
   const [message, setMessage] = useState<{ type: "error" | "success"; text: string } | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const [imageFile2, setImageFile2] = useState<File | null>(null);
+  const [imagePreview2, setImagePreview2] = useState<string>("");
   const [fields, setFields] = useState(() => initFields(item));
 
   function set(key: keyof typeof fields) {
@@ -73,10 +75,18 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
     setImagePreview(file ? URL.createObjectURL(file) : "");
   }
 
+  function handleFileChange2(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] ?? null;
+    setImageFile2(file);
+    setImagePreview2(file ? URL.createObjectURL(file) : "");
+  }
+
   function openEdit() {
     setFields(initFields(item));
     setImageFile(null);
     setImagePreview("");
+    setImageFile2(null);
+    setImagePreview2("");
     setMessage(null);
     setIsEditing(true);
   }
@@ -85,6 +95,8 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
     setIsEditing(false);
     setImageFile(null);
     setImagePreview("");
+    setImageFile2(null);
+    setImagePreview2("");
   }
 
   async function handleUpdate(e: React.FormEvent) {
@@ -94,9 +106,9 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
 
     try {
       let imageUrl = item.image_url;
-      if (imageFile) {
-        imageUrl = await uploadImage(imageFile);
-      }
+      let imageUrl2 = item.image_url_2;
+      if (imageFile) imageUrl = await uploadImage(imageFile);
+      if (imageFile2) imageUrl2 = await uploadImage(imageFile2);
 
       const details =
         item.category === "card"
@@ -125,6 +137,7 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
       const payload: UpdateItemInput = {
         name: fields.name,
         image_url: imageUrl,
+        image_url_2: imageUrl2,
         price: Number(fields.price),
         purchase_date: fields.purchase_date,
         purchase_place: fields.purchase_place,
@@ -144,6 +157,8 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
       setIsEditing(false);
       setImageFile(null);
       setImagePreview("");
+      setImageFile2(null);
+      setImagePreview2("");
       router.refresh();
     } catch (error) {
       setMessage({
@@ -206,31 +221,52 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
           </label>
 
           <div className="space-y-1">
-            <p className="text-sm font-semibold text-vault-muted">Image</p>
-            {item.image_url && !imagePreview && (
-              <div className="relative mb-2 h-24 w-24 overflow-hidden rounded-lg border-[3px] border-vault-border">
-                <Image src={item.image_url} alt="Current image" fill className="object-cover" />
+            <p className="text-sm font-semibold text-vault-muted">Images</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-vault-muted">Front</p>
+                {item.image_url && !imagePreview && (
+                  <div className="relative mb-2 h-24 w-full overflow-hidden rounded-lg border-[3px] border-vault-border">
+                    <Image src={item.image_url} alt="Current front" fill className="object-cover" />
+                  </div>
+                )}
+                <label className="flex cursor-pointer items-center gap-2 rounded-lg border-[3px] border-dashed border-vault-border bg-vault-soft px-3 py-2 transition-all hover:border-vault-primary hover:bg-white focus-within:border-vault-primary">
+                  <UploadIcon />
+                  <span className="text-xs font-semibold text-vault-muted">
+                    {imageFile ? imageFile.name : "Replace front"}
+                  </span>
+                  <input type="file" accept="image/*" className="sr-only" onChange={handleFileChange} aria-label="Replace front image" />
+                </label>
+                {imagePreview && (
+                  <div className="overflow-hidden rounded-lg border-[3px] border-vault-border">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={imagePreview} alt="Front preview" className="h-auto w-full" />
+                  </div>
+                )}
               </div>
-            )}
-            <label className="flex cursor-pointer items-center gap-3 rounded-lg border-[3px] border-dashed border-vault-border bg-vault-soft px-4 py-3 transition-all hover:border-vault-primary hover:bg-white focus-within:border-vault-primary">
-              <UploadIcon />
-              <span className="text-sm font-semibold text-vault-muted">
-                {imageFile ? imageFile.name : "Replace image (optional)"}
-              </span>
-              <input
-                type="file"
-                accept="image/*"
-                className="sr-only"
-                onChange={handleFileChange}
-                aria-label="Replace item image"
-              />
-            </label>
-            {imagePreview && (
-              <div className="mt-2 overflow-hidden rounded-lg border-[3px] border-vault-border">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imagePreview} alt="New image preview" className="h-32 w-full object-cover" />
+
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-vault-muted">Back</p>
+                {item.image_url_2 && !imagePreview2 && (
+                  <div className="relative mb-2 h-24 w-full overflow-hidden rounded-lg border-[3px] border-vault-border">
+                    <Image src={item.image_url_2} alt="Current back" fill className="object-cover" />
+                  </div>
+                )}
+                <label className="flex cursor-pointer items-center gap-2 rounded-lg border-[3px] border-dashed border-vault-border bg-vault-soft px-3 py-2 transition-all hover:border-vault-primary hover:bg-white focus-within:border-vault-primary">
+                  <UploadIcon />
+                  <span className="text-xs font-semibold text-vault-muted">
+                    {imageFile2 ? imageFile2.name : "Replace back"}
+                  </span>
+                  <input type="file" accept="image/*" className="sr-only" onChange={handleFileChange2} aria-label="Replace back image" />
+                </label>
+                {imagePreview2 && (
+                  <div className="overflow-hidden rounded-lg border-[3px] border-vault-border">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={imagePreview2} alt="Back preview" className="h-auto w-full" />
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
           {item.category === "card" && item.details && "player" in item.details ? (

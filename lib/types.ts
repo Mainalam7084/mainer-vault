@@ -8,6 +8,7 @@ export interface Item {
   name: string;
   category: ItemCategory;
   image_url: string;
+  image_url_2: string;
   price: number;
   purchase_date: string;
   purchase_place: string;
@@ -59,6 +60,7 @@ export interface CreateItemInput {
   name: string;
   category: ItemCategory;
   image_url: string;
+  image_url_2: string;
   price: number;
   purchase_date: string;
   purchase_place: string;
@@ -69,6 +71,7 @@ export interface CreateItemInput {
 export interface UpdateItemInput {
   name: string;
   image_url: string;
+  image_url_2: string;
   price: number;
   purchase_date: string;
   purchase_place: string;

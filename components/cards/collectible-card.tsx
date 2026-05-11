@@ -16,18 +16,32 @@ export function CollectibleCard({ item }: { item: ItemWithDetails }) {
           : "border-vault-border bg-vault-card shadow-vault hover:shadow-vault-hover"
       }`}
     >
-      <div className="mb-3 overflow-hidden rounded-lg border-[3px] border-vault-border bg-vault-soft">
-        {item.image_url ? (
-          <Image
-            src={item.image_url}
-            alt={item.name}
-            width={0}
-            height={0}
-            sizes="(max-width: 768px) 100vw, 33vw"
-            className="h-auto w-full transition duration-300 group-hover:scale-105"
-          />
-        ) : null}
-      </div>
+      {(item.image_url || item.image_url_2) && (
+        <div
+          className={`mb-3 overflow-hidden rounded-lg border-[3px] border-vault-border bg-vault-soft ${item.image_url && item.image_url_2 ? "grid grid-cols-2" : ""}`}
+        >
+          {item.image_url && (
+            <Image
+              src={item.image_url}
+              alt={`${item.name} front`}
+              width={0}
+              height={0}
+              sizes="(max-width: 768px) 50vw, 20vw"
+              className="h-auto w-full transition duration-300 group-hover:scale-105"
+            />
+          )}
+          {item.image_url_2 && (
+            <Image
+              src={item.image_url_2}
+              alt={`${item.name} back`}
+              width={0}
+              height={0}
+              sizes="(max-width: 768px) 50vw, 20vw"
+              className="h-auto w-full transition duration-300 group-hover:scale-105"
+            />
+          )}
+        </div>
+      )}
       <div className="mb-2 flex items-center justify-between">
         <Badge className={categoryColor[item.category]}>{categoryLabel[item.category]}</Badge>
         <Badge className="bg-white text-vault-text">{item.rarity}</Badge>
