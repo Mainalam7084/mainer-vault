@@ -29,55 +29,82 @@ export function CollectionGrid({
   const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    else params.delete("search");
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (category && category !== "all") params.set("category", category);
+      if (minPrice) params.set("minPrice", minPrice);
+      if (maxPrice) params.set("maxPrice", maxPrice);
+      router.replace(`${pathname}?${params.toString()}`);
+    }, 400);
 
-    if (category && category !== "all") params.set("category", category);
-    else params.delete("category");
-
-    if (minPrice) params.set("minPrice", minPrice);
-    else params.delete("minPrice");
-
-    if (maxPrice) params.set("maxPrice", maxPrice);
-    else params.delete("maxPrice");
-
-    router.replace(`${pathname}?${params.toString()}`);
+    return () => clearTimeout(timer);
   }, [category, maxPrice, minPrice, pathname, router, search]);
 
   return (
     <>
-      <CardContainer className="mb-5 grid gap-3 md:grid-cols-4">
-        <Input placeholder="Search by name..." value={search} onChange={(e) => setSearch(e.target.value)} />
-        <Select value={category} onChange={(e) => setCategory(e.target.value as ItemCategory | "all")}>
-          <option value="all">All Categories</option>
-          <option value="card">Football Cards</option>
-          <option value="coin">Coins</option>
-          <option value="banknote">Banknotes</option>
-        </Select>
-        <Input
-          type="number"
-          value={minPrice}
-          onChange={(e) => setMinPrice(e.target.value)}
-          placeholder="Min price"
-        />
-        <Input
-          type="number"
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(e.target.value)}
-          placeholder="Max price"
-        />
+      <CardContainer className="mb-5">
+        <fieldset className="grid gap-3 md:grid-cols-4">
+          <legend className="sr-only">Filter collection</legend>
+          <label className="space-y-1">
+            <span className="sr-only">Search by name</span>
+            <Input
+              placeholder="Search by name…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              aria-label="Search by name"
+            />
+          </label>
+          <label className="space-y-1">
+            <span className="sr-only">Filter by category</span>
+            <Select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as ItemCategory | "all")}
+              aria-label="Filter by category"
+            >
+              <option value="all">All Categories</option>
+              <option value="card">Football Cards</option>
+              <option value="coin">Coins</option>
+              <option value="banknote">Banknotes</option>
+            </Select>
+          </label>
+          <label className="space-y-1">
+            <span className="sr-only">Minimum price</span>
+            <Input
+              type="number"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              placeholder="Min price ($)"
+              aria-label="Minimum price"
+              min={0}
+            />
+          </label>
+          <label className="space-y-1">
+            <span className="sr-only">Maximum price</span>
+            <Input
+              type="number"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              placeholder="Max price ($)"
+              aria-label="Maximum price"
+              min={0}
+            />
+          </label>
+        </fieldset>
       </CardContainer>
 
       {items.length === 0 ? (
         <CardContainer>
           <h3 className="text-xl font-black">No items found</h3>
-          <p className="text-sm text-vault-muted">Try changing filters or add a new collectible.</p>
+          <p className="mt-1 text-sm text-vault-muted">Try changing filters or add a new collectible.</p>
         </CardContainer>
       ) : (
-        <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <section
+          aria-label={`${items.length} item${items.length === 1 ? "" : "s"} in collection`}
+          className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4"
+        >
           {items.map((item) => (
-          <CollectibleCard key={item.id} item={item} />
+            <CollectibleCard key={item.id} item={item} />
           ))}
         </section>
       )}
