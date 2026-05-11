@@ -6,10 +6,10 @@ export function CardContainer({
   className?: string;
 }) {
   return (
-    <section
+    <div
       className={`rounded-vault border-[3px] border-vault-border bg-vault-card p-4 shadow-vault md:p-5 ${className}`}
     >
       {children}
-    </section>
+    </div>
   );
 }

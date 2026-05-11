@@ -3,10 +3,7 @@ import { AppShell } from "@/components/layout/app-shell";
 
 export default function AddPage() {
   return (
-    <AppShell
-      title="Add New Piece"
-      subtitle="Dynamic form with image preview and category-aware metadata."
-    >
+    <AppShell title="Add New Item">
       <AddItemForm />
     </AppShell>
   );

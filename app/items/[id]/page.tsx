@@ -20,7 +20,7 @@ export default async function ItemDetailPage({
   }
 
   return (
-    <AppShell title={item.name} subtitle="Detailed collectible profile with value and provenance.">
+    <AppShell title={item.name}>
       <CardContainer className="grid gap-5 lg:grid-cols-2">
         <div className="relative aspect-square overflow-hidden rounded-vault border-[3px] border-vault-border bg-vault-soft">
           {item.image_url ? (

@@ -16,10 +16,7 @@ export default async function CollectionPage({
   const items = await getAllItems({ search, category, minPrice, maxPrice });
 
   return (
-    <AppShell
-      title="Your Collection"
-      subtitle="Collector-first gallery with fast filtering and bold vault cards."
-    >
+    <AppShell title="Your Collection">
       <CollectionGrid
         items={items}
         initialSearch={search}
