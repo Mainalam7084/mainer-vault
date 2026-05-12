@@ -7,8 +7,8 @@ export interface Item {
   user_id: string;
   name: string;
   category: ItemCategory;
-  image_url: string;
-  image_url_2: string;
+  image_url: string | null;
+  image_url_2: string | null;
   price: number;
   purchase_date: string;
   purchase_place: string;
@@ -59,8 +59,8 @@ export interface ItemFilters {
 export interface CreateItemInput {
   name: string;
   category: ItemCategory;
-  image_url: string;
-  image_url_2: string;
+  image_url: string | null;
+  image_url_2: string | null;
   price: number;
   purchase_date: string;
   purchase_place: string;
@@ -70,8 +70,8 @@ export interface CreateItemInput {
 
 export interface UpdateItemInput {
   name: string;
-  image_url: string;
-  image_url_2: string;
+  image_url: string | null;
+  image_url_2: string | null;
   price: number;
   purchase_date: string;
   purchase_place: string;

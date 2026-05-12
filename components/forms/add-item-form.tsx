@@ -61,8 +61,8 @@ export function AddItemForm() {
 
     try {
       const formData = new FormData(event.currentTarget);
-      let finalImageUrl = "";
-      let finalImageUrl2 = "";
+      let finalImageUrl: string | null = null;
+      let finalImageUrl2: string | null = null;
 
       if (imageFile) finalImageUrl = await uploadImage(imageFile);
       if (imageFile2) finalImageUrl2 = await uploadImage(imageFile2);

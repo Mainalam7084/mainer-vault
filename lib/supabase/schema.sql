@@ -93,3 +93,10 @@ with check (bucket_id = 'items');
 -- ============================================================
 -- alter table public.items
 --   add column if not exists user_id uuid references auth.users(id) on delete cascade;
+
+-- ============================================================
+-- MIGRATION: add image_url_2 column (second/back image).
+-- Run in Supabase SQL Editor if your items table already exists.
+-- ============================================================
+-- alter table public.items
+--   add column if not exists image_url_2 text;

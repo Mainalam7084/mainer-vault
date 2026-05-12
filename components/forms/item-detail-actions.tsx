@@ -105,8 +105,8 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
     setMessage(null);
 
     try {
-      let imageUrl = item.image_url;
-      let imageUrl2 = item.image_url_2;
+      let imageUrl: string | null = item.image_url;
+      let imageUrl2: string | null = item.image_url_2;
       if (imageFile) imageUrl = await uploadImage(imageFile);
       if (imageFile2) imageUrl2 = await uploadImage(imageFile2);
 
