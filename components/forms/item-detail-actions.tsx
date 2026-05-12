@@ -176,7 +176,7 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
       const response = await fetch(`/api/items/${item.id}`, { method: "DELETE" });
       const body = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(body.error ?? "Failed to delete item.");
-      router.push("/collection");
+      router.push("/dashboard");
       router.refresh();
     } catch (error) {
       setMessage({
@@ -361,7 +361,7 @@ export function ItemDetailActions({ item }: { item: ItemWithDetails }) {
             Delete
           </Button>
           <Link
-            href="/collection"
+            href="/dashboard"
             className="inline-flex items-center rounded-lg px-3 py-2 text-sm font-semibold text-vault-muted underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-vault-primary"
           >
             Back to collection

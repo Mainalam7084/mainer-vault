@@ -1,8 +1,9 @@
 import { StatCard } from "@/components/ui/stat-card";
 import { AppShell } from "@/components/layout/app-shell";
-import { CardContainer } from "@/components/ui/card-container";
+import { CollectionGrid } from "@/components/cards/collection-grid";
 import { totalCollectionValue } from "@/lib/helpers/collection";
 import { getAllItems } from "@/lib/supabase/queries";
+import { ItemCategory } from "@/lib/types";
 
 function IconBox() {
   return (
@@ -69,58 +70,39 @@ function IconTrophy() {
   );
 }
 
-function IconClock() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
-}
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ search?: string; category?: string; minPrice?: string; maxPrice?: string }>;
+}) {
+  const params = await searchParams;
+  const search = params.search ?? "";
+  const category = params.category as ItemCategory | undefined;
+  const minPrice = params.minPrice ? Number(params.minPrice) : undefined;
+  const maxPrice = params.maxPrice ? Number(params.maxPrice) : undefined;
 
-export default async function DashboardPage() {
-  const items = await getAllItems();
-  const totalValue = totalCollectionValue(items);
-  const rareCount = items.filter((item) => item.rarity !== "Common").length;
-  const recentItems = items.slice(0, 3);
+  const items = await getAllItems({ search, category, minPrice, maxPrice });
+  const allItems = await getAllItems();
+  const totalValue = totalCollectionValue(allItems);
+  const rareCount = allItems.filter((item) => item.rarity !== "Common").length;
 
   return (
     <AppShell title="Dashboard">
-      <section aria-label="Collection stats" className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Total Items" value={items.length} icon={<IconBox />} />
+      <section aria-label="Collection stats" className="grid gap-4 md:grid-cols-3">
+        <StatCard label="Total Items" value={allItems.length} icon={<IconBox />} />
         <StatCard label="Total Value" value={Math.round(totalValue)} prefix="€" icon={<IconValue />} />
         <StatCard label="Rare Items" value={rareCount} icon={<IconTrophy />} />
-        <StatCard label="Recent Additions" value={recentItems.length} icon={<IconClock />} />
       </section>
 
-      {recentItems.length > 0 && (
-        <CardContainer className="mt-8">
-          <h2 className="text-xl font-black">Recent Items</h2>
-          <div className="mt-4 grid gap-3 md:grid-cols-3">
-            {recentItems.map((item) => (
-              <article
-                key={item.id}
-                className="rounded-lg border-[3px] border-vault-border bg-white p-3 shadow-vault"
-              >
-                <p className="text-sm font-bold text-vault-primary">{item.category}</p>
-                <h3 className="font-black text-vault-text">{item.name}</h3>
-                <p className="text-sm text-vault-muted">{item.purchase_place}</p>
-              </article>
-            ))}
-          </div>
-        </CardContainer>
-      )}
+      <div className="mt-8">
+        <CollectionGrid
+          items={items}
+          initialSearch={search}
+          initialCategory={params.category ?? "all"}
+          initialMinPrice={params.minPrice ?? ""}
+          initialMaxPrice={params.maxPrice ?? ""}
+        />
+      </div>
     </AppShell>
   );
 }

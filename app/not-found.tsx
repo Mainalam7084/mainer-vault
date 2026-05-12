@@ -10,7 +10,7 @@ export default function NotFound() {
           This collectible is not in the vault, or maybe it has been moved.
         </p>
         <Link
-          href="/collection"
+          href="/dashboard"
           className="mt-5 inline-flex rounded-full border-[3px] border-vault-border bg-vault-accent px-4 py-2 font-bold text-vault-text"
         >
           Return to Collection
